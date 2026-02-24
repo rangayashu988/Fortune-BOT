@@ -1,0 +1,5 @@
+{
+  "name": "Forbes Global 2000 AI Job Bot",
+  "description": "An AI-powered assistant that searches Forbes Global 2000 career portals, matches your resume to openings, and prepares application materials.",
+  "requestFramePermissions": []
+}
