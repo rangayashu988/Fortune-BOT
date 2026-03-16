@@ -1,20 +1,23 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# FortuneBot
 
-# Run and deploy your AI Studio app
+FortuneBot is a multi-user recruiting assistant with:
 
-This contains everything you need to run your app locally.
+- login and session-based auth
+- saved search history and applications
+- AI-assisted job search and cover letters
+- realistic fallback search/application generation when Gemini is unavailable
+- PostgreSQL-ready persistence for production deployments
 
-View your app in AI Studio: https://ai.studio/apps/d85aceb1-a856-42b3-9c3d-1f741b2039ef
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## Local development
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Create `.env` from [`.env.example`](C:/Users/vinod/OneDrive/Documents/New%20project/Fortune-BOT/.env.example)
 3. Run the app:
    `npm run dev`
+
+The app runs locally at `http://localhost:3000`.
+
+## Production deployment
+
+For Google Cloud Run deployment instructions, see [DEPLOY_GCP.md](./DEPLOY_GCP.md).

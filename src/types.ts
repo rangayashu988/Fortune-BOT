@@ -21,3 +21,16 @@ export interface UserProfile {
   targetRoles: string[];
   preferredLocations: string[];
 }
+
+export interface ApplicationMaterial {
+  id: string;
+  job: Job;
+  coverLetter: string;
+  createdAt: string;
+}
+
+export interface AppState {
+  profile: UserProfile;
+  searchHistory: string[];
+  applications: ApplicationMaterial[];
+}

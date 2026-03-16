@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+.codex-server.pid
+fortune-bot.db
+fortune-bot.db-shm
+fortune-bot.db-wal

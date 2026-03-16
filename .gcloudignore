@@ -1,0 +1,12 @@
+.git
+.gitignore
+node_modules
+.env
+.env.*
+fortune-bot.db
+fortune-bot.db-shm
+fortune-bot.db-wal
+server.out.log
+server.err.log
+server.log
+.codex-server.pid
