@@ -62,9 +62,11 @@ export default function App() {
 
   const [profile, setProfile] = useState<UserProfile>(emptyProfile);
   const [searchQuery, setSearchQuery] = useState('');
+  const [targetRolesInput, setTargetRolesInput] = useState('');
+  const [preferredLocationsInput, setPreferredLocationsInput] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [timeFilter, setTimeFilter] = useState<'all' | '24h' | 'older'>('all');
+  const [timeFilter, setTimeFilter] = useState<'24h' | 'currentWeek' | 'pastWeek' | '10d'>('24h');
   const [applications, setApplications] = useState<ApplicationMaterial[]>([]);
   const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
   const [isGeneratingLetter, setIsGeneratingLetter] = useState(false);
@@ -76,12 +78,7 @@ export default function App() {
   const [isBootstrapping, setIsBootstrapping] = useState(false);
 
   const selectedApplication = applications.find((application) => application.id === selectedApplicationId) ?? null;
-  const filteredJobs = jobs.filter((job) => {
-    if (timeFilter === 'all') return true;
-    const postedDate = new Date(job.postedDate);
-    const diffInHours = (Date.now() - postedDate.getTime()) / (1000 * 60 * 60);
-    return timeFilter === '24h' ? diffInHours <= 24 : diffInHours > 24;
-  });
+  const filteredJobs = jobs.filter((job) => matchesTimeFilter(job.postedDate, timeFilter));
 
   useEffect(() => {
     async function bootstrap() {
@@ -101,6 +98,8 @@ export default function App() {
   useEffect(() => {
     if (!currentUser) {
       setProfile(emptyProfile);
+      setTargetRolesInput('');
+      setPreferredLocationsInput('');
       setSearchHistory([]);
       setApplications([]);
       setSelectedApplicationId(null);
@@ -117,6 +116,8 @@ export default function App() {
         const state = await getAppState();
         if (cancelled) return;
         setProfile({ ...state.profile, email: currentUser.email, name: state.profile.name || currentUser.name });
+        setTargetRolesInput(state.profile.targetRoles.join(', '));
+        setPreferredLocationsInput(state.profile.preferredLocations.join(', '));
         setSearchHistory(state.searchHistory);
         setApplications(state.applications);
         setSelectedApplicationId(state.applications[0]?.id ?? null);
@@ -187,7 +188,14 @@ export default function App() {
     setIsSavingProfile(true);
     setWorkspaceError(null);
     try {
-      await persistWorkspace({ profile: { ...profile, email: currentUser?.email ?? profile.email } });
+      await persistWorkspace({
+        profile: {
+          ...profile,
+          email: currentUser?.email ?? profile.email,
+          targetRoles: splitValues(targetRolesInput),
+          preferredLocations: splitValues(preferredLocationsInput),
+        },
+      });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
     } catch (error) {
@@ -294,7 +302,7 @@ export default function App() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.20),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.16),_transparent_26%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] px-4 py-8 text-white md:px-8">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.30),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(251,146,60,0.18),_transparent_24%),radial-gradient(circle_at_bottom_left,_rgba(34,197,94,0.16),_transparent_20%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] px-4 py-8 text-white md:px-8">
         <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl gap-8 xl:grid-cols-[1.1fr_520px] xl:items-center">
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
@@ -311,7 +319,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="rounded-[36px] border border-white/10 bg-white/8 p-6 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-8">
+          <div className="rounded-[36px] border border-white/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.16),_rgba(255,255,255,0.08))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-8">
             <div className="flex rounded-2xl border border-white/10 bg-slate-950/50 p-1">
               <AuthTab active={authMode === 'login'} onClick={() => { setAuthMode('login'); setResetHint(null); }} label="Login" />
               <AuthTab active={authMode === 'signup'} onClick={() => { setAuthMode('signup'); setResetHint(null); }} label="Sign Up" />
@@ -365,9 +373,9 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(29,78,216,0.16),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(217,119,6,0.12),_transparent_24%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_48%,_#ecfeff_100%)] text-slate-950">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.18),_transparent_24%),radial-gradient(circle_at_top_right,_rgba(249,115,22,0.18),_transparent_22%),radial-gradient(circle_at_bottom_left,_rgba(16,185,129,0.14),_transparent_24%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_42%,_#ecfeff_100%)] text-slate-950">
       <div className="mx-auto flex min-h-screen max-w-[1600px] gap-6 px-4 py-4 md:px-6">
-        <aside className="hidden w-[280px] shrink-0 flex-col rounded-[32px] border border-white/70 bg-slate-950 px-6 py-7 text-white shadow-[0_24px_80px_rgba(15,23,42,0.28)] lg:flex">
+        <aside className="hidden w-[280px] shrink-0 flex-col rounded-[32px] border border-slate-900/80 bg-[linear-gradient(180deg,_#020617_0%,_#0b1120_38%,_#082f49_100%)] px-6 py-7 text-white shadow-[0_24px_80px_rgba(15,23,42,0.28)] lg:flex">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25">
               <Sparkles size={22} />
@@ -395,7 +403,7 @@ export default function App() {
           </button>
         </aside>
 
-        <main className="flex-1 rounded-[32px] border border-white/70 bg-white/75 shadow-[0_24px_80px_rgba(148,163,184,0.22)] backdrop-blur-xl">
+        <main className="flex-1 rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.86),_rgba(255,255,255,0.74))] shadow-[0_24px_80px_rgba(148,163,184,0.22)] backdrop-blur-xl">
           <div className="border-b border-slate-200/70 px-5 py-4 md:px-8">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
@@ -456,16 +464,17 @@ export default function App() {
             <AnimatePresence mode="wait">
               {activeTab === 'search' && (
                 <motion.section key="search" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mt-8 space-y-6">
-                  <div className="rounded-[30px] border border-slate-200/70 bg-white p-5 shadow-sm md:p-6">
+                  <div className="rounded-[30px] border border-slate-200/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.92))] p-5 shadow-sm md:p-6">
                     <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                       <div>
                         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Bot Search Queue</p>
                         <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Tell FortuneBot what role to hunt and it will turn profile memory into ranked matches</h3>
                       </div>
-                      <div className="flex rounded-2xl border border-slate-200 bg-slate-50 p-1">
-                        <FilterButton active={timeFilter === 'all'} onClick={() => setTimeFilter('all')} label="All" />
+                      <div className="flex flex-wrap rounded-2xl border border-slate-200 bg-slate-50 p-1">
                         <FilterButton active={timeFilter === '24h'} onClick={() => setTimeFilter('24h')} label="Last 24h" />
-                        <FilterButton active={timeFilter === 'older'} onClick={() => setTimeFilter('older')} label="Older" />
+                        <FilterButton active={timeFilter === 'currentWeek'} onClick={() => setTimeFilter('currentWeek')} label="Current Week" />
+                        <FilterButton active={timeFilter === 'pastWeek'} onClick={() => setTimeFilter('pastWeek')} label="Past Week" />
+                        <FilterButton active={timeFilter === '10d'} onClick={() => setTimeFilter('10d')} label="Past 10 Days" />
                       </div>
                     </div>
 
@@ -474,7 +483,7 @@ export default function App() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Senior Product Designer, AI Engineer, Talent Analytics Manager..." className="h-12 w-full bg-transparent pl-8 text-base text-slate-900 outline-none placeholder:text-slate-400" />
                       </div>
-                      <button type="submit" disabled={isSearching} className="inline-flex items-center justify-center gap-2 rounded-[28px] bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
+                      <button type="submit" disabled={isSearching} className="inline-flex items-center justify-center gap-2 rounded-[28px] bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50">
                         {isSearching ? <Loader2 size={18} className="animate-spin" /> : <WandSparkles size={18} />}
                         Search Jobs
                       </button>
@@ -532,8 +541,8 @@ export default function App() {
                     <div className="mt-8 grid gap-5 md:grid-cols-2">
                       <Field label="Full Name" value={profile.name} onChange={(value) => setProfile((current) => ({ ...current, name: value }))} placeholder="Ava Thompson" />
                       <Field label="Email Address" value={currentUser.email} onChange={() => {}} placeholder="" type="email" readOnly />
-                      <Field label="Target Roles" value={profile.targetRoles.join(', ')} onChange={(value) => setProfile((current) => ({ ...current, targetRoles: splitValues(value) }))} placeholder="Product Designer, Growth PM" />
-                      <Field label="Preferred Locations" value={profile.preferredLocations.join(', ')} onChange={(value) => setProfile((current) => ({ ...current, preferredLocations: splitValues(value) }))} placeholder="Remote, New York, London" />
+                      <Field label="Target Roles" value={targetRolesInput} onChange={setTargetRolesInput} placeholder="Product Designer, Growth PM" />
+                      <Field label="Preferred Locations" value={preferredLocationsInput} onChange={setPreferredLocationsInput} placeholder="Remote, New York, London" />
                     </div>
 
                     <div className="mt-5">
@@ -590,7 +599,7 @@ export default function App() {
                               <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{selectedApplication.job.title}</h3>
                               <p className="mt-2 text-sm text-slate-500">{selectedApplication.job.company} • {selectedApplication.job.location}</p>
                             </div>
-                            <button onClick={() => window.open(selectedApplication.job.url, '_blank')} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700">Apply on Portal <ExternalLink size={16} /></button>
+                            <button onClick={() => window.open(getApplyUrl(selectedApplication.job), '_blank')} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700">{getApplyLabel(selectedApplication.job)} <ExternalLink size={16} /></button>
                           </div>
                         </div>
 
@@ -626,6 +635,44 @@ export default function App() {
 }
 function splitValues(value: string) {
   return value.split(',').map((item) => item.trim()).filter(Boolean);
+}
+
+function matchesTimeFilter(postedDateValue: string, filter: '24h' | 'currentWeek' | 'pastWeek' | '10d') {
+  const postedDate = new Date(postedDateValue);
+  if (Number.isNaN(postedDate.getTime())) return false;
+
+  const now = new Date();
+  const diffInMs = now.getTime() - postedDate.getTime();
+  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+  const currentDay = now.getDay();
+  const mondayOffset = currentDay === 0 ? 6 : currentDay - 1;
+  const startOfCurrentWeek = new Date(now);
+  startOfCurrentWeek.setHours(0, 0, 0, 0);
+  startOfCurrentWeek.setDate(now.getDate() - mondayOffset);
+
+  const startOfPastWeek = new Date(startOfCurrentWeek);
+  startOfPastWeek.setDate(startOfCurrentWeek.getDate() - 7);
+
+  if (filter === '24h') return diffInMs <= 1000 * 60 * 60 * 24;
+  if (filter === 'currentWeek') return postedDate >= startOfCurrentWeek;
+  if (filter === 'pastWeek') return postedDate >= startOfPastWeek && postedDate < startOfCurrentWeek;
+  return diffInDays <= 10;
+}
+
+function isGenericPortalUrl(url: string) {
+  return /\/jobs\/?$|\/careers\/?$|search-jobs|jobsearch|keywords=|search=|\/positions\/?\?|\/search\?|\bjobs\?/.test(url.toLowerCase());
+}
+
+function getApplyUrl(job: Job) {
+  if (job.url && !isGenericPortalUrl(job.url)) return job.url;
+  if (job.linkedinUrl) return job.linkedinUrl;
+  return job.url;
+}
+
+function getApplyLabel(job: Job) {
+  if (job.url && !isGenericPortalUrl(job.url)) return 'Apply Direct';
+  if (job.linkedinUrl) return 'Open Best Match';
+  return 'Open Job Search';
 }
 
 function AuthMetric({ label, value }: { label: string; value: string }) {
@@ -677,6 +724,8 @@ function Field({ label, value, onChange, placeholder, type = 'text', readOnly = 
 }
 
 function JobCard({ job, onGenerate, onReportDead, isGenerating }: { job: Job; onGenerate: () => void; onReportDead: () => void; isGenerating: boolean }) {
+  const applyUrl = getApplyUrl(job);
+  const applyLabel = getApplyLabel(job);
   return (
     <motion.article initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-[30px] border border-slate-200/70 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
@@ -705,7 +754,7 @@ function JobCard({ job, onGenerate, onReportDead, isGenerating }: { job: Job; on
 
       <div className="mt-6 flex flex-col gap-4 border-t border-slate-200 pt-5 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-4 text-sm font-semibold">
-          <a href={job.url} target="_blank" rel="noopener noreferrer" className={cn('inline-flex items-center gap-1 transition', job.verificationStatus === 'dead' ? 'text-rose-600 hover:text-rose-700' : 'text-sky-700 hover:text-sky-900')}>{job.verificationStatus === 'dead' ? 'Portal link may be broken' : 'View Portal'} <ExternalLink size={14} /></a>
+          <a href={applyUrl} target="_blank" rel="noopener noreferrer" className={cn('inline-flex items-center gap-1 transition', job.verificationStatus === 'dead' ? 'text-rose-600 hover:text-rose-700' : 'text-sky-700 hover:text-sky-900')}>{job.verificationStatus === 'dead' ? 'Apply link may be broken' : applyLabel} <ExternalLink size={14} /></a>
           {job.linkedinUrl ? (
             <a href={job.linkedinUrl} target="_blank" rel="noopener noreferrer" className={cn('inline-flex items-center gap-1 transition', job.linkedinVerificationStatus === 'dead' ? 'text-rose-600 hover:text-rose-700' : 'text-[#0A66C2] hover:text-[#004182]')}>LinkedIn <Linkedin size={14} /></a>
           ) : (
@@ -714,7 +763,7 @@ function JobCard({ job, onGenerate, onReportDead, isGenerating }: { job: Job; on
           <button onClick={onReportDead} className="text-slate-400 transition hover:text-rose-500">Remove</button>
         </div>
 
-        <button onClick={onGenerate} disabled={isGenerating} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">{isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />} Prepare Application</button>
+        <button onClick={onGenerate} disabled={isGenerating} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50">{isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />} Prepare Application</button>
       </div>
     </motion.article>
   );

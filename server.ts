@@ -441,6 +441,7 @@ Role query: ${query}
 Target roles: ${safeProfile.targetRoles.join(', ') || 'Not specified'}
 Preferred locations: ${safeProfile.preferredLocations.join(', ') || 'Not specified'}
 Resume summary: ${safeProfile.resumeText.substring(0, 1000) || 'Not provided'}
+Important: the url field must point to the direct job detail or direct application page for that specific role. Do not return generic careers homepages, category pages, or company landing pages.
 Return only JSON with fields: title, company, location, url, postedDate, matchScore, matchReason, linkedinUrl, visaStatus.`;
 }
 
@@ -498,6 +499,7 @@ Target Roles: ${safeProfile.targetRoles.join(', ') || 'Not specified'}
 Preferred Locations: ${safeProfile.preferredLocations.join(', ') || 'Not specified'}
 Current Date: ${currentDate}
 Return a JSON array of jobs with: title, company, location, url, linkedinUrl (optional), postedDate (YYYY-MM-DD), matchScore (0-100), matchReason, and visaStatus.
+The url must be the direct posting or direct application page for the exact role. Reject generic careers portals, broad job search pages, and company homepages.
 Resume summary for matching:
 ${safeProfile.resumeText.substring(0, 1000) || 'Not provided'}...`;
 }
