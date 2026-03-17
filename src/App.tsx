@@ -1,4 +1,4 @@
-
+﻿
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
@@ -298,16 +298,16 @@ export default function App() {
         <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl gap-8 xl:grid-cols-[1.1fr_520px] xl:items-center">
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-              <ShieldCheck size={14} /> Secure recruiting agent
+              <ShieldCheck size={14} /> AI recruiting operator
             </div>
             <div>
-              <h1 className="max-w-3xl text-5xl font-semibold leading-tight tracking-tight md:text-6xl">Login to FortuneBot and keep every recruiter session protected.</h1>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">The app now supports sign up, sign in, and server-backed sessions stored in the database.</p>
+              <h1 className="max-w-3xl text-5xl font-semibold leading-tight tracking-tight md:text-6xl">Sign in to your AI job-search bot and keep every search, draft, and candidate workflow in one secure workspace.</h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">FortuneBot remembers candidate context, hunts relevant openings, verifies outbound links, and prepares application drafts without exposing the model key in the browser.</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              <AuthMetric label="Sessions" value="DB-backed" />
-              <AuthMetric label="Security" value="Hashed passwords" />
-              <AuthMetric label="Scale" value="100+ users" />
+              <AuthMetric label="Bot Memory" value="Saved per user" />
+              <AuthMetric label="Security" value="Server-side auth" />
+              <AuthMetric label="Workflow" value="Search to apply" />
             </div>
           </div>
 
@@ -353,9 +353,15 @@ export default function App() {
   }
 
   const heroMetrics = [
-    { label: 'User', value: currentUser.name, icon: Users },
+    { label: 'Operator', value: currentUser.name, icon: Users },
     { label: 'Tracked Searches', value: `${searchHistory.length}`, icon: Search },
     { label: 'Saved Applications', value: `${applications.length}`, icon: FileText },
+  ];
+  const workflowSteps = [
+    { label: '1. Load memory', detail: 'Use the saved candidate profile, target roles, locations, and resume summary.' },
+    { label: '2. Hunt roles', detail: 'Search openings, rank fit, and keep searches tied to the signed-in workspace.' },
+    { label: '3. Verify links', detail: 'Check employer portals and LinkedIn routes before sending users out to apply.' },
+    { label: '4. Draft applications', detail: 'Generate a cover letter and archive every application draft for reuse.' },
   ];
 
   return (
@@ -393,7 +399,7 @@ export default function App() {
           <div className="border-b border-slate-200/70 px-5 py-4 md:px-8">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-600">AI recruiting cockpit</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-600">FortuneBot command center</p>
                 <div className="mt-2 flex items-center gap-3 text-sm text-slate-500">
                   <span>Dashboard</span>
                   <ChevronRight size={14} />
@@ -415,9 +421,9 @@ export default function App() {
             <section className="rounded-[30px] border border-white/70 bg-[linear-gradient(135deg,_rgba(14,116,144,0.95),_rgba(30,64,175,0.96))] px-6 py-7 text-white shadow-[0_24px_60px_rgba(14,116,144,0.22)] md:px-8">
               <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-end">
                 <div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100"><Star size={14} /> Session-secured agent</div>
-                  <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight tracking-tight md:text-5xl">A secure recruiting agent with persistent login and protected user sessions.</h2>
-                  <p className="mt-4 max-w-2xl text-sm leading-7 text-cyan-50/90 md:text-base">Each signed-in user gets their own saved profile, search history, and generated applications, all protected behind a real login flow.</p>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100"><Star size={14} /> Recruiter-style AI workflow</div>
+                  <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight tracking-tight md:text-5xl">An AI bot that remembers the candidate, searches openings, verifies portals, and drafts applications.</h2>
+                  <p className="mt-4 max-w-2xl text-sm leading-7 text-cyan-50/90 md:text-base">This workspace is built around the real FortuneBot loop: candidate memory in, ranked jobs out, verified links, then a generated application draft saved back to the user account.</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
                   {heroMetrics.map((metric) => (
@@ -427,6 +433,14 @@ export default function App() {
                     </div>
                   ))}
                 </div>
+              </div>
+              <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                {workflowSteps.map((step) => (
+                  <div key={step.label} className="rounded-[24px] border border-white/12 bg-white/10 px-4 py-4 backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">{step.label}</p>
+                    <p className="mt-3 text-sm leading-6 text-cyan-50/90">{step.detail}</p>
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -445,8 +459,8 @@ export default function App() {
                   <div className="rounded-[30px] border border-slate-200/70 bg-white p-5 shadow-sm md:p-6">
                     <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                       <div>
-                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Opportunity Search</p>
-                        <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Search real openings with a recruiter-grade workflow</h3>
+                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Bot Search Queue</p>
+                        <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Tell FortuneBot what role to hunt and it will turn profile memory into ranked matches</h3>
                       </div>
                       <div className="flex rounded-2xl border border-slate-200 bg-slate-50 p-1">
                         <FilterButton active={timeFilter === 'all'} onClick={() => setTimeFilter('all')} label="All" />
@@ -484,16 +498,24 @@ export default function App() {
                       ) : filteredJobs.length > 0 ? (
                         filteredJobs.map((job) => <JobCard key={job.id} job={job} onGenerate={() => void handleGenerateLetter(job)} onReportDead={() => setJobs((current) => current.filter((item) => item.id !== job.id))} isGenerating={isGeneratingLetter && selectedApplication?.job.id === job.id} />)
                       ) : (
-                        <div className="rounded-[30px] border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center text-slate-500"><Briefcase className="mx-auto text-slate-300" size={34} /><p className="mt-4 text-lg font-semibold text-slate-900">No search results yet</p><p className="mt-2 text-sm">Choose a role above and FortuneBot will return live openings with AI-ranked fits.</p></div>
+                        <div className="rounded-[30px] border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center text-slate-500"><Briefcase className="mx-auto text-slate-300" size={34} /><p className="mt-4 text-lg font-semibold text-slate-900">The bot is waiting for a role query</p><p className="mt-2 text-sm">Type a role, then FortuneBot will search, score, verify, and prepare the next application workflow.</p></div>
                       )}
                     </div>
 
                     <div className="space-y-4">
-                      <InsightPanel title="Session-backed workspaces" subtitle="Security upgrade">
+                      <InsightPanel title="How FortuneBot works" subtitle="Bot flow">
                         <ul className="space-y-3 text-sm leading-6 text-slate-600">
-                          <li>Users sign in with email and password.</li>
-                          <li>Passwords are hashed before storage.</li>
-                          <li>Sessions are stored in the database and sent as HTTP-only cookies.</li>
+                          <li>Searches use candidate profile memory, not just the raw role query.</li>
+                          <li>Every result is checked against the portal and optional LinkedIn path.</li>
+                          <li>Prepare Application turns one selected role into a saved draft.</li>
+                          <li>When Gemini is unavailable, the bot falls back gracefully instead of breaking the UI.</li>
+                        </ul>
+                      </InsightPanel>
+                      <InsightPanel title="Why this workspace matters" subtitle="Operator view">
+                        <ul className="space-y-3 text-sm leading-6 text-slate-600">
+                          <li>Each signed-in user gets isolated state and saved applications.</li>
+                          <li>The backend keeps secrets server-side so the browser never owns the model key.</li>
+                          <li>The layout is designed to feel like a recruiting command console, not a generic form app.</li>
                         </ul>
                       </InsightPanel>
                     </div>
@@ -504,8 +526,8 @@ export default function App() {
                 <motion.section key="profile" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="rounded-[30px] border border-slate-200/70 bg-white p-6 shadow-sm md:p-8">
                     <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Candidate Memory</p>
-                    <h3 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Profile that follows the signed-in user</h3>
-                    <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">This profile is now tied to the authenticated session, not a manual email field in the header.</p>
+                    <h3 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">The memory bank FortuneBot uses before every search and application draft</h3>
+                    <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">This workspace profile is the bot context layer. It follows the signed-in user and shapes search relevance, messaging, and saved application output.</p>
 
                     <div className="mt-8 grid gap-5 md:grid-cols-2">
                       <Field label="Full Name" value={profile.name} onChange={(value) => setProfile((current) => ({ ...current, name: value }))} placeholder="Ava Thompson" />
@@ -531,9 +553,9 @@ export default function App() {
                   <div className="space-y-4">
                     <InsightPanel title="Login flow" subtitle="What was added">
                       <ul className="space-y-3 text-sm leading-6 text-slate-600">
-                        <li>Dedicated login page and signup mode.</li>
-                        <li>DB-backed sessions survive refreshes.</li>
-                        <li>Workspace loads automatically after successful authentication.</li>
+                        <li>Dedicated sign in, sign up, forgot-password, and reset flows.</li>
+                        <li>DB-backed sessions survive refreshes and protect per-user workspaces.</li>
+                        <li>The profile here becomes the instruction set for the bot&apos;s downstream search and drafting behavior.</li>
                       </ul>
                     </InsightPanel>
                   </div>
@@ -544,7 +566,7 @@ export default function App() {
                 <motion.section key="applications" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mt-8 grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
                   <div className="rounded-[30px] border border-slate-200/70 bg-white p-5 shadow-sm">
                     <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Application Archive</p>
-                    <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Saved application drafts</h3>
+                    <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Application drafts generated by FortuneBot</h3>
                     <div className="mt-5 space-y-3">
                       {applications.length > 0 ? applications.map((application) => (
                         <button key={application.id} onClick={() => setSelectedApplicationId(application.id)} className={cn('w-full rounded-[24px] border px-4 py-4 text-left transition', selectedApplicationId === application.id ? 'border-sky-200 bg-sky-50' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-slate-50')}>
@@ -553,7 +575,7 @@ export default function App() {
                           <p className="mt-3 text-xs uppercase tracking-[0.22em] text-slate-400">{new Date(application.createdAt).toLocaleString()}</p>
                         </button>
                       )) : (
-                        <div className="rounded-[24px] border border-dashed border-slate-300 px-4 py-10 text-center text-sm text-slate-500">Generate a cover letter to populate the archive.</div>
+                        <div className="rounded-[24px] border border-dashed border-slate-300 px-4 py-10 text-center text-sm text-slate-500">Run Prepare Application from the search tab and the bot will save the draft here.</div>
                       )}
                     </div>
                   </div>
@@ -566,7 +588,7 @@ export default function App() {
                             <div>
                               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Selected draft</p>
                               <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{selectedApplication.job.title}</h3>
-                              <p className="mt-2 text-sm text-slate-500">{selectedApplication.job.company} � {selectedApplication.job.location}</p>
+                              <p className="mt-2 text-sm text-slate-500">{selectedApplication.job.company} • {selectedApplication.job.location}</p>
                             </div>
                             <button onClick={() => window.open(selectedApplication.job.url, '_blank')} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700">Apply on Portal <ExternalLink size={16} /></button>
                           </div>
@@ -702,6 +724,7 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: 'sky' | 'e
   const toneClasses = { sky: 'border-sky-200 bg-sky-50 text-sky-700', emerald: 'border-emerald-200 bg-emerald-50 text-emerald-700', rose: 'border-rose-200 bg-rose-50 text-rose-700', amber: 'border-amber-200 bg-amber-50 text-amber-700' }[tone];
   return <div className={cn('inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold', toneClasses)}>{children}</div>;
 }
+
 
 
 
