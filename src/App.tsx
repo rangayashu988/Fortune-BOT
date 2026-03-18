@@ -664,15 +664,12 @@ function isGenericPortalUrl(url: string) {
 }
 
 function getApplyUrl(job: Job) {
-  if (job.url && !isGenericPortalUrl(job.url)) return job.url;
-  if (job.linkedinUrl) return job.linkedinUrl;
   return job.url;
 }
 
 function getApplyLabel(job: Job) {
   if (job.url && !isGenericPortalUrl(job.url)) return 'Apply Direct';
-  if (job.linkedinUrl) return 'Open Best Match';
-  return 'Open Job Search';
+  return 'Open Company Posting';
 }
 
 function AuthMetric({ label, value }: { label: string; value: string }) {
